@@ -155,6 +155,37 @@ const mutation = new GraphQLObjectType({
         await Book.findByIdAndDelete(args.id);
         return args.id;
       }
+    },
+    updateAuthor: {
+      type: AuthorType,
+      args: { 
+        id: { type: GraphQLID },
+        author: { type: AuthorInputType }
+      },
+      async resolve(parentValue, args) {
+        // Update author
+        await Author.findByIdAndUpdate(args.id, args.author);
+        const author = await Author.findById(args.id);
+        return author;
+      }
+    },
+    updateBook: {
+      type: BookType,
+      args: {
+        id: { type: GraphQLID },
+        book: { type: BookInputType }
+      },
+      async resolve(parentValue, args) {
+        // Update book
+        const updates = {
+          ...args.book,
+          author: args.book.authorId
+        };
+
+        await Book.findByIdAndUpdate(args.id, updates);
+        const book = await Book.findById(args.id);
+        return book;
+      }
     }
   })
 })
